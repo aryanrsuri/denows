@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title></title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"> -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .hidden {
+      display: none
+    }
+
+    #chat_room {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .sms {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="flex flex-col p-0 m-0 mx-auto container">
+    <div class="p-4">
+      <header class="flex flex-row justify-between align-center mb-12">
+        <h1 class="text-4xl font-black text-rose-800">Deno Chat</h1>
+        <button class="border rounded border-2 border-solid border-black p-2 font-bold"> Login </button>
+      </header>
+      <div class="">
+        <input class="border rounded p-1 border-2 border-solid border-black" type="text" id="message" name="message"
+          placeholder="Enter message" required>
+        <div class="mt-12 mb-0" id="chat_users"> </div>
+        <div class="mt-0" id="chat_room"> </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    let name = prompt("Enter name") || "Anon"
+    let ws = new WebSocket(`ws://localhost:8000/ws?username=${name}`);
+    ws.onmessage = (m) => {
+      const data = JSON.parse(m.data)
+      switch (data.event) {
+        case "update-users":
+          let userlist = ``
+          data.usernames.forEach((username) => {
+            userlist += `<small class="text-green-600 font-bold"> ${username} </small>`
+          })
+          document.getElementById("chat_users").innerHTML = ""
+          document.getElementById("chat_users").innerHTML
+            += userlist;
+          break;
+        case "send-message":
+          const template =
+            `
+              <div class="flex flex-row justify-start gap-4 text-md mb-2"> <p class="font-black">${data.username}: </p>    <p class="">${data.message} </p>  <p class="text-green-400">[ ${data.timestamp} ] </p></div>
+            `
+          document.getElementById("chat_room").innerHTML += template;
+      }
+    }
+
+    window.onload = () => {
+      let sender = document.getElementById("message")
+      sender.addEventListener("keypress", (e) => {
+        if (e.key == "Enter") {
+          ws.send(JSON.stringify({
+            event: "send-message",
+            message: sender.value,
+          }),
+          );
+
+          sender.value = ""
+        }
+      })
+
+    }
+  </script>
+</body>
+
+</html>
