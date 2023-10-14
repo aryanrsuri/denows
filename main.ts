@@ -96,7 +96,7 @@ async function handler(request: Request): Promise<Response> {
   return new Response("NOT FOUND", { status: 404 });
 }
 Deno.serve(
-  { port: 8000, hostname: "0.0.0.0", handler },
+  { port: 80, hostname: "0.0.0.0", handler },
 );
 //
 // const chat = async (socket: WebSocket, res: Response) => {

@@ -43,7 +43,7 @@
   </main>
   <script>
     let name = prompt("Enter name") || "Anon"
-    let ws = new WebSocket(`ws://localhost:8000/ws?username=${name}`);
+    let ws = new WebSocket(`ws://localhost:80/ws?username=${name}`);
     ws.onmessage = (m) => {
       const data = JSON.parse(m.data)
       switch (data.event) {
